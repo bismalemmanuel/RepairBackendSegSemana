@@ -6,27 +6,39 @@ const {
   updateUser,
   deleteUser,
   findUser,
+  updatePassword,
 } = require('../controllers/users.controllers');
+const {
+  protectAccountOwner,
+  protect,
+  restrictTo,
+} = require('../middlewares/auth.middleware');
 const { validIfExistUser } = require('../middlewares/user.middleware');
+const { validateFields } = require('../middlewares/validateField.middleware');
 
 const router = Router();
 
-router.get('', findAllUsers);
+router.use(protect);
+
+router.get('/', findAllUsers);
 router.get('/:id', validIfExistUser, findUser);
-
-router.post(
-  '/',
+router.patch('/:id', validIfExistUser, protectAccountOwner, updateUser);
+router.delete('/:id', validIfExistUser, protectAccountOwner, deleteUser);
+router.patch(
+  '/password/:id',
   [
-    check('username', 'The username must be mandatory').not().isEmpty(),
-    check('email', 'The email must be mandatory').not().isEmpty(),
-    check('email', 'The email must be a correct format').isEmail(),
-    check('password', 'The password must be mandatory').not().isEmpty(),
+    check('currentPassword', 'The current password must be mandatory')
+      .not()
+      .isEmpty(),
+    check('newPassword', 'The new password must be mandatory').not().isEmpty(),
+    validateFields,
+    validIfExistUser,
+    protectAccountOwner,
+    restrictTo('employee'),
   ],
-  createUser
+  protectAccountOwner,
+  updatePassword
 );
-
-router.patch('/:id', validIfExistUser, updateUser);
-router.delete('/:id', validIfExistUser, deleteUser);
 
 module.exports = {
   usersRouter: router,

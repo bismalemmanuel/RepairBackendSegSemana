@@ -1,6 +1,5 @@
 const { validationResult } = require('express-validator');
 
-
 /* A middleware function that checks if the request body has any errors. If there are errors, it
 returns a 400 status code with the errors. If there are no errors, it calls the next middleware
 function. */

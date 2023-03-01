@@ -6,6 +6,7 @@ const { db } = require('../database/db');
 const globalErrorHandler = require('../controllers/error.controller');
 const AppError = require('../utils/appError');
 const initModel = require('./init.model');
+const { authRouter } = require('../routes/auth.routes');
 
 class Server {
   constructor() {
@@ -13,6 +14,7 @@ class Server {
     this.port = process.env.PORT || 4000;
 
     this.paths = {
+      auth: '/api/v1/auth',
       user: '/api/v1/users',
       repairs: '/api/v1/repairs',
     };
@@ -31,6 +33,7 @@ class Server {
   routes() {
     this.app.use(this.paths.user, usersRouter);
     this.app.use(this.paths.repairs, repairsRouter);
+    this.app.use(this.paths.auth, authRouter);
 
     this.app.all('*', (req, res, next) => {
       return next(
